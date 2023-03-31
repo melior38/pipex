@@ -6,13 +6,13 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 13:04:11 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/31 04:51:10 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 05:18:03 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int first_fork(int *file, int *fd, char **av, t_data *data, char **env)
+int first_fork(int *file, int *fd, t_setup *setup, t_data *data)
 {
 	int pid;
 
@@ -25,16 +25,16 @@ int first_fork(int *file, int *fd, char **av, t_data *data, char **env)
 		printf("first fork\n");
 		improved_dup2(file[0], STDIN_FILENO);
 		improved_dup2(fd[1], STDOUT_FILENO);
-		data->flag = ft_split(av[2], ' ');
-		ft_get_path(data, av[2], env);
-		execve(data->splited_path[data->i], data->flag, env);
+		data->flag = ft_split(setup->av[2], ' ');
+		ft_get_path(data, setup->av[2], setup->env);
+		execve(data->splited_path[data->i], data->flag, setup->env);
 		exit(1);
 	}
 	close(file[0]);
 	return (pid);
 }
 
-int last_fork(int *file, int *fd, char **av, t_data *data, char **env)
+int last_fork(int *file, int *fd, t_setup *setup, t_data *data)
 {
 	int pid;
 
@@ -45,16 +45,16 @@ int last_fork(int *file, int *fd, char **av, t_data *data, char **env)
 		printf("last fork\n");
 		improved_dup2(file[1], STDOUT_FILENO);
 		improved_dup2(fd[0], STDIN_FILENO);
-		data->flag = ft_split(av[3], ' ');
-		ft_get_path(data, av[3], env);
-		execve(data->splited_path[data->i], data->flag, env);
+		data->flag = ft_split(setup->av[3], ' ');
+		ft_get_path(data, setup->av[3], setup->env);
+		execve(data->splited_path[data->i], data->flag, setup->env);
 		exit(1);
 	}
 	close(file[1]);
 	return (pid);
 }
 
-int middle_fork(int *tmp, int *fd, char **av, t_data *data, char **env)
+int middle_fork(int *tmp, int *fd, t_setup *setup, t_data *data)
 {
 	int pid;
 
@@ -68,9 +68,9 @@ int middle_fork(int *tmp, int *fd, char **av, t_data *data, char **env)
 		improved_dup2(tmp[0], STDIN_FILENO);
 		close(tmp[1]);
 		close(fd[0]);
-		data->flag = ft_split(av[3], ' ');
-		ft_get_path(data, av[3], env);
-		execve(data->splited_path[data->i], data->flag, env);
+		data->flag = ft_split(setup->av[3], ' ');
+		ft_get_path(data, setup->av[3], setup->env);
+		execve(data->splited_path[data->i], data->flag, setup->env);
 		exit(1);
 	}
 	close(tmp[0]);
@@ -80,8 +80,6 @@ int middle_fork(int *tmp, int *fd, char **av, t_data *data, char **env)
 
 void	close_and_wait(int *fd, int *pid, int i)
 {
-	// close(tmp[0]);
-	// close(tmp[1]);
 	close(fd[0]);
 	close(fd[1]);
 	while (i >= 0)
@@ -89,7 +87,7 @@ void	close_and_wait(int *fd, int *pid, int i)
 	free(pid);
 }
 
-void	pipex(int ac, char **av, char **env, int *files, t_data *data)
+void	pipex(int ac, t_setup *setup, int *files, t_data *data)
 {
 	int	fd[2];
 	int *pid;
@@ -99,7 +97,7 @@ void	pipex(int ac, char **av, char **env, int *files, t_data *data)
 	pid = malloc(sizeof(int *) * ac - 3);
 	if (!pid)
 		exit(1);
-	pid[0] = first_fork(files, fd, av, data, env);
+	pid[0] = first_fork(files, fd, setup, data);
 	i = 3;
 	if (ac > 5)
 	{
@@ -107,10 +105,10 @@ void	pipex(int ac, char **av, char **env, int *files, t_data *data)
 		{
 			fd_copy(tmp, fd);
 			improved_pipe(fd);
-			pid[i - 2] = middle_fork(tmp, fd, av, data, env);
+			pid[i - 2] = middle_fork(tmp, fd, setup, data);
 			i++;
 		}
 	}
-	pid[i] = last_fork(files, fd, av, data, env);
+	pid[i] = last_fork(files, fd, setup, data);
 	close_and_wait(fd, pid, i);
 }

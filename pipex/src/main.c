@@ -6,7 +6,7 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 16:13:53 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/31 03:56:37 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 05:12:57 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,11 @@ int main(int ac, char **av, char **env)
 	// improved_dup2 (improved_dup2(int stdin, int stdout);) / la stdouot est rediriger dans stdin
 	// process (child) fork watch
 	t_data	data;
+	t_setup	setup;
 	int		file[2];
 	
+	setup.env = env;
+	setup.av = av;
 	if (ac <= 4)
 	{
 		ft_putstr_fd("error not enough arguement\n", 2);
@@ -75,6 +78,6 @@ int main(int ac, char **av, char **env)
 		ft_putstr_fd("pipex will close\n", 2);
 		exit(1);
 	}
-	pipex(ac, av, env, file, &data);
+	pipex(ac, &setup, file, &data);
 	exit(0);
 }
