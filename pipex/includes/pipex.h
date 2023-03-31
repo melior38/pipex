@@ -6,7 +6,7 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 16:14:09 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/31 05:19:14 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 18:20:42 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ typedef struct s_setup {
 	char	**av;
 	char	**env;
 }				t_setup;
-
 
 void	ft_get_path(t_data *path, char *av, char **env);
 int		improved_dup2(int fildes, int fildes2);

@@ -6,15 +6,15 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 13:04:11 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/31 05:18:03 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 18:16:48 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int first_fork(int *file, int *fd, t_setup *setup, t_data *data)
+int	first_fork(int *file, int *fd, t_setup *setup, t_data *data)
 {
-	int pid;
+	int	pid;
 
 	improved_pipe(fd);
 	pid = improved_fork();
@@ -34,12 +34,12 @@ int first_fork(int *file, int *fd, t_setup *setup, t_data *data)
 	return (pid);
 }
 
-int last_fork(int *file, int *fd, t_setup *setup, t_data *data)
+int	last_fork(int *file, int *fd, t_setup *setup, t_data *data)
 {
-	int pid;
+	int	pid;
 
 	pid = improved_fork();
-	if(pid == 0)
+	if (pid == 0)
 	{
 		close(fd[1]);
 		printf("last fork\n");
@@ -54,12 +54,12 @@ int last_fork(int *file, int *fd, t_setup *setup, t_data *data)
 	return (pid);
 }
 
-int middle_fork(int *tmp, int *fd, t_setup *setup, t_data *data)
+int	middle_fork(int *tmp, int *fd, t_setup *setup, t_data *data)
 {
-	int pid;
+	int	pid;
 
 	pid = improved_fork();
-	if(pid == 0)
+	if (pid == 0)
 	{
 		close(fd[0]);
 		close(tmp[1]);
@@ -90,9 +90,9 @@ void	close_and_wait(int *fd, int *pid, int i)
 void	pipex(int ac, t_setup *setup, int *files, t_data *data)
 {
 	int	fd[2];
-	int *pid;
+	int	*pid;
 	int	i;
-	int tmp[2];
+	int	tmp[2];
 
 	pid = malloc(sizeof(int *) * ac - 3);
 	if (!pid)
