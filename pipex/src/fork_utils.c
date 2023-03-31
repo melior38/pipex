@@ -6,7 +6,7 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 13:04:11 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/23 14:23:21 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 04:51:10 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,13 @@ int first_fork(int *file, int *fd, char **av, t_data *data, char **env)
 {
 	int pid;
 
+	improved_pipe(fd);
 	pid = improved_fork();
-	if (pid == 0) // tu veut recup infile dans cmd1 et dans le else mettre dans la cmd2
+	if (pid == 0)
 	{
 		close(fd[0]);
 		close(file[1]);
+		printf("first fork\n");
 		improved_dup2(file[0], STDIN_FILENO);
 		improved_dup2(fd[1], STDOUT_FILENO);
 		data->flag = ft_split(av[2], ' ');
@@ -28,6 +30,7 @@ int first_fork(int *file, int *fd, char **av, t_data *data, char **env)
 		execve(data->splited_path[data->i], data->flag, env);
 		exit(1);
 	}
+	close(file[0]);
 	return (pid);
 }
 
@@ -39,30 +42,75 @@ int last_fork(int *file, int *fd, char **av, t_data *data, char **env)
 	if(pid == 0)
 	{
 		close(fd[1]);
-		close(file[0]);
+		printf("last fork\n");
 		improved_dup2(file[1], STDOUT_FILENO);
 		improved_dup2(fd[0], STDIN_FILENO);
-		data->flag = ft_split(av[3], ' '); // free tab
-		ft_get_path(&data, av[3], env);
+		data->flag = ft_split(av[3], ' ');
+		ft_get_path(data, av[3], env);
 		execve(data->splited_path[data->i], data->flag, env);
 		exit(1);
 	}
+	close(file[1]);
+	return (pid);
 }
 
-// int middle_fork(int *file, int *fd, char **av, t_data *data, char **env)
-// {
-// 	int pid;
+int middle_fork(int *tmp, int *fd, char **av, t_data *data, char **env)
+{
+	int pid;
 
-// 	pid = improved_fork();
-// 	if(pid == 0)
-// 	{
-// 		close(fd[1]);
-// 		close(file[0]);
-// 		improved_dup2(file[1], STDOUT_FILENO);
-// 		improved_dup2(fd[0], STDIN_FILENO);
-// 		data->flag = ft_split(av[3], ' '); // free tab
-// 		ft_get_path(&data, av[3], env);
-// 		execve(data->splited_path[data->i], data->flag, env);
-// 		exit(1);
-// 	}
-// }
+	pid = improved_fork();
+	if(pid == 0)
+	{
+		close(fd[0]);
+		close(tmp[1]);
+		printf("middle fork\n");
+		improved_dup2(fd[1], STDOUT_FILENO);
+		improved_dup2(tmp[0], STDIN_FILENO);
+		close(tmp[1]);
+		close(fd[0]);
+		data->flag = ft_split(av[3], ' ');
+		ft_get_path(data, av[3], env);
+		execve(data->splited_path[data->i], data->flag, env);
+		exit(1);
+	}
+	close(tmp[0]);
+	close(tmp[1]);
+	return (pid);
+}
+
+void	close_and_wait(int *fd, int *pid, int i)
+{
+	// close(tmp[0]);
+	// close(tmp[1]);
+	close(fd[0]);
+	close(fd[1]);
+	while (i >= 0)
+		wait(&pid[i--]);
+	free(pid);
+}
+
+void	pipex(int ac, char **av, char **env, int *files, t_data *data)
+{
+	int	fd[2];
+	int *pid;
+	int	i;
+	int tmp[2];
+
+	pid = malloc(sizeof(int *) * ac - 3);
+	if (!pid)
+		exit(1);
+	pid[0] = first_fork(files, fd, av, data, env);
+	i = 3;
+	if (ac > 5)
+	{
+		while (i < ac - 2)
+		{
+			fd_copy(tmp, fd);
+			improved_pipe(fd);
+			pid[i - 2] = middle_fork(tmp, fd, av, data, env);
+			i++;
+		}
+	}
+	pid[i] = last_fork(files, fd, av, data, env);
+	close_and_wait(fd, pid, i);
+}

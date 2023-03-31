@@ -6,7 +6,7 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:47:42 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/23 12:10:59 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/27 15:21:00 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,3 +26,10 @@ void	free_tab(char **split)
 	free(split);
 	split = NULL;
 }
+
+void	fd_copy(int *dst, int *src)
+{
+	dst[0] = src[0];
+	dst[1] = src[1];
+}
+

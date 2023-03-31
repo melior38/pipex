@@ -6,7 +6,7 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 16:14:09 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/23 14:23:27 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 04:34:19 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,8 @@ pid_t	improved_fork(void);
 void	free_tab(char **split);
 int		first_fork(int *file, int *fd, char **av, t_data *data, char **env);
 int		last_fork(int *file, int *fd, char **av, t_data *data, char **env);
+void	fd_copy(int *dst, int *src);
+void	close_and_wait(int *fd, int *pid, int i);
+void	pipex(int ac, char **av, char **env, int *files, t_data *data);
 
 #endif

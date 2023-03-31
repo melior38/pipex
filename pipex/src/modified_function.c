@@ -6,7 +6,7 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:48:17 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/23 12:31:42 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 04:52:38 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@ int	improved_dup2(int fildes, int fildes2)
 	error = dup2(fildes, fildes2);
 	if (error == -1)
 	{
-		perror("error");
+		perror("error1");
 		exit(1);
 	}
 	return (error);
 }
 
-int	improved_pipe(int *fd)
+int	improved_pipe(int fd[2])
 {
 	int error;
 	error = pipe(fd);
@@ -47,5 +47,3 @@ pid_t	improved_fork(void)
 	}
 	return (error);
 }
-
-// int	improved_open()

@@ -6,7 +6,7 @@
 /*   By: asouchet <asouchet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 16:13:53 by asouchet          #+#    #+#             */
-/*   Updated: 2023/03/23 14:24:04 by asouchet         ###   ########.fr       */
+/*   Updated: 2023/03/31 03:56:37 by asouchet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,22 +59,22 @@ int main(int ac, char **av, char **env)
 	// improved_dup2 (improved_dup2(int stdin, int stdout);) / la stdouot est rediriger dans stdin
 	// process (child) fork watch
 	t_data	data;
-	int		fd[2];
 	int		file[2];
-	// int		pid1;
-	int		pid2;
 	
 	if (ac <= 4)
-		return (0);
+	{
+		ft_putstr_fd("error not enough arguement\n", 2);
+		ft_putstr_fd("pipex will close\n", 2);
+		exit(1);
+	}
 	file[0] = open(av[1], O_RDONLY); // check error
 	file[1]	= open(av[ac - 1], O_CREAT | O_TRUNC | O_WRONLY, 0644); // same
-	improved_pipe(fd);
-	first_fork(file, fd, av, &data, env);
-	last_fork(file, fd, av, &data, env);
-	close(fd[0]);
-	close(fd[1]);
-	close(file[0]);
-	close(file[1]);
-	waitpid(pid2,0 ,0);
+	if (file[0] < 0 || file[1] < 0)
+	{
+		ft_putstr_fd("error: infile or outfile non existant\n", 2);
+		ft_putstr_fd("pipex will close\n", 2);
+		exit(1);
+	}
+	pipex(ac, av, env, file, &data);
 	exit(0);
 }
